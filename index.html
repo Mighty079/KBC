@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaun Banega Crorepati - Web Edition</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Favicon -->
+    <link rel="icon" href="assets/logo.webp" type="image/webp">
+</head>
+<body>
+
+    <!-- Ambient background glows -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- SCREEN 1: WELCOME / START SCREEN -->
+    <div id="welcome-screen" class="screen active">
+        <div class="welcome-container">
+            <div class="logo-wrapper">
+                <img src="assets/logo.webp" alt="KBC Logo" class="rotating-logo">
+            </div>
+            
+            <h1 class="game-title">KAUN BANEGA CROREPATI</h1>
+            <p class="game-subtitle">Test your wisdom. Win the ultimate prize of ₹7 Crore.</p>
+
+            <div class="rules-card card">
+                <h3><i class="fas fa-info-circle text-gold"></i> Rules of the Game</h3>
+                <ul>
+                    <li>Answer 16 multiple-choice questions correctly to win ₹7 Crore.</li>
+                    <li>There are two <strong>Safe Zones (Padaav)</strong>: Question 5 (₹10,000) and Question 10 (₹3,20,000).</li>
+                    <li>If you answer incorrectly, you fall back to the last safe zone amount.</li>
+                    <li>You have 4 valuable Lifelines available throughout the game.</li>
+                    <li>Timer: 30s for Q1-5, 45s for Q6-10, No timer for Q11-16.</li>
+                </ul>
+            </div>
+
+            <div class="setup-section card">
+                <h3>Select Question Category</h3>
+                <div class="category-grid">
+                    <button class="category-btn active" data-category="general">
+                        <i class="fas fa-globe-asia"></i> General Knowledge
+                    </button>
+                    <button class="category-btn" data-category="science">
+                        <i class="fas fa-flask"></i> Science & Tech
+                    </button>
+                    <button class="category-btn" data-category="sports">
+                        <i class="fas fa-running"></i> Sports & Games
+                    </button>
+                    <button class="category-btn" data-category="entertainment">
+                        <i class="fas fa-film"></i> Entertainment
+                    </button>
+                    <button class="category-btn" data-category="geography">
+                        <i class="fas fa-map-marked-alt"></i> Geography & Nature
+                    </button>
+                    <button class="category-btn" data-category="mix">
+                        <i class="fas fa-random"></i> Mix Category
+                    </button>
+                </div>
+
+                <button id="start-game-btn" class="glow-button">
+                    <span class="btn-text"><i class="fas fa-play"></i> START GAME</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: GAMEPLAY SCREEN -->
+    <div id="game-screen" class="screen">
+        <div class="game-layout">
+            
+            <!-- Main Game Board -->
+            <div class="game-board">
+                <!-- Top Controls (Lifelines & Header Info) -->
+                <div class="game-header">
+                    <div class="current-category-badge">
+                        Category: <span id="display-category" class="text-gold">General Knowledge</span>
+                    </div>
+
+                    <div class="lifelines-container">
+                        <button class="lifeline-btn" id="lifeline-50-50" title="50-50: Remove 2 wrong options">
+                            <img src="assets/50-50.png" alt="50:50">
+                        </button>
+                        <button class="lifeline-btn" id="lifeline-audience" title="Audience Poll: Ask the studio audience">
+                            <img src="assets/Audience Poll.png" alt="Audience Poll">
+                        </button>
+                        <button class="lifeline-btn" id="lifeline-phone" title="Phone a Friend: Call a subject expert">
+                            <img src="assets/Ask a Friend.png" alt="Phone a Friend">
+                        </button>
+                        <button class="lifeline-btn" id="lifeline-flip" title="Flip the Question: Replace current question">
+                            <img src="assets/Pass.png" alt="Flip Question">
+                        </button>
+                    </div>
+
+                    <button id="quit-game-btn" class="quit-btn" title="Walk Away with Current Winnings">
+                        <i class="fas fa-sign-out-alt"></i> Quit & Quit Winnings
+                    </button>
+                </div>
+
+                <!-- Clock / Timer Area -->
+                <div class="timer-area">
+                    <div class="timer-circle-wrapper">
+                        <svg class="timer-svg" viewBox="0 0 100 100">
+                            <circle class="timer-track" cx="50" cy="50" r="45"></circle>
+                            <circle class="timer-bar" cx="50" cy="50" r="45" id="timer-progress"></circle>
+                        </svg>
+                        <div class="timer-value" id="timer-display">30</div>
+                    </div>
+                </div>
+
+                <!-- Question and Options Container -->
+                <div class="question-options-container">
+                    
+                    <!-- Question Box (Diamond Layout representation in CSS) -->
+                    <div class="question-box-wrapper">
+                        <div class="line-connector left"></div>
+                        <div class="question-box">
+                            <p id="question-text">Question loading...</p>
+                        </div>
+                        <div class="line-connector right"></div>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div class="options-grid">
+                        <div class="option-container" id="container-option-0">
+                            <button class="option-btn" data-index="0">
+                                <span class="option-letter">A:</span>
+                                <span class="option-text" id="option-0-text">Option A</span>
+                            </button>
+                        </div>
+                        <div class="option-container" id="container-option-1">
+                            <button class="option-btn" data-index="1">
+                                <span class="option-letter">B:</span>
+                                <span class="option-text" id="option-1-text">Option B</span>
+                            </button>
+                        </div>
+                        <div class="option-container" id="container-option-2">
+                            <button class="option-btn" data-index="2">
+                                <span class="option-letter">C:</span>
+                                <span class="option-text" id="option-2-text">Option C</span>
+                            </button>
+                        </div>
+                        <div class="option-container" id="container-option-3">
+                            <button class="option-btn" data-index="3">
+                                <span class="option-letter">D:</span>
+                                <span class="option-text" id="option-3-text">Option D</span>
+                            </button>
+                    </div>
+                </div>
+            </div>
+
+                <!-- Confirm Lock Answer Button -->
+                <div class="confirm-lock-wrapper text-center">
+                    <button id="confirm-lock-btn" class="glow-button hidden" style="margin: 10px 0 20px 0; padding: 12px 35px; font-size: 1.05rem; width: auto; max-width: 250px;">
+                        <span class="btn-text"><i class="fas fa-check-circle"></i> Confirm Lock</span>
+                    </button>
+                </div>
+
+                <!-- Host Feedback and Commentary Area -->
+                <div class="host-commentary-box">
+                    <div class="host-avatar">
+                        <img src="assets/logo.webp" alt="Host Logo">
+                    </div>
+                    <div class="commentary-bubble">
+                        <p id="host-speech">Welcome to Kaun Banega Crorepati. Choose your options wisely!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Money Tree Sidebar (Slides out on mobile/tablet) -->
+            <div class="money-sidebar" id="money-sidebar">
+                <div class="sidebar-header">
+                    <img src="assets/logo.webp" alt="KBC Logo" class="sidebar-logo">
+                    <h3>MONEY LADDER</h3>
+                    <button class="close-sidebar-btn" id="close-sidebar-btn" title="Close Ladder">&times;</button>
+                </div>
+                <div class="ladder-container" id="money-ladder">
+                    <!-- Loaded dynamically via script.js -->
+                </div>
+                <div class="sidebar-footer">
+                    <div class="winnings-counter">
+                        <span class="label">Current Safe Winnings:</span>
+                        <span id="current-safe-winnings" class="value text-gold">₹0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hamburger Button for mobile money sidebar -->
+            <button class="sidebar-toggle" id="sidebar-toggle" title="View Money Ladder">
+                <i class="fas fa-list-ul"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: GAME OVER / WIN SCREEN -->
+    <div id="gameover-screen" class="screen">
+        <div class="gameover-container welcome-container">
+            <div class="congrats-confetti">
+                <i class="fas fa-trophy text-gold award-icon"></i>
+            </div>
+            
+            <h1 id="gameover-title" class="game-title">GAME OVER</h1>
+            
+            <div class="winnings-summary card">
+                <p id="gameover-message">You played well! Here is your final score:</p>
+                <div class="grand-prize" id="gameover-winnings">₹0</div>
+                <p class="payout-status" id="gameover-detail">Fell back to the safe zone.</p>
+            </div>
+
+            <div class="stats-card card">
+                <h3><i class="fas fa-chart-line text-gold"></i> Game Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Level Reached:</span>
+                        <span class="stat-value text-gold" id="stat-level">0/16</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Questions Solved:</span>
+                        <span class="stat-value text-gold" id="stat-questions">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Lifelines Used:</span>
+                        <span class="stat-value text-gold" id="stat-lifelines">0/4</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Time Remaining:</span>
+                        <span class="stat-value text-gold" id="stat-time">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <button id="restart-game-btn" class="glow-button">
+                <span class="btn-text"><i class="fas fa-redo"></i> PLAY AGAIN</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: AUDIENCE POLL -->
+    <div class="modal-overlay" id="modal-audience">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h2><i class="fas fa-users"></i> Audience Poll Results</h2>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-description">The audience has cast their votes. Here is their collective opinion:</p>
+                <div class="poll-chart-container">
+                    <div class="poll-bar-wrapper">
+                        <div class="poll-label">A</div>
+                        <div class="poll-bar-track">
+                            <div class="poll-bar-fill" id="poll-bar-0"></div>
+                        </div>
+                        <div class="poll-percent" id="poll-percent-0">0%</div>
+                    </div>
+                    <div class="poll-bar-wrapper">
+                        <div class="poll-label">B</div>
+                        <div class="poll-bar-track">
+                            <div class="poll-bar-fill" id="poll-bar-1"></div>
+                        </div>
+                        <div class="poll-percent" id="poll-percent-1">0%</div>
+                    </div>
+                    <div class="poll-bar-wrapper">
+                        <div class="poll-label">C</div>
+                        <div class="poll-bar-track">
+                            <div class="poll-bar-fill" id="poll-bar-2"></div>
+                        </div>
+                        <div class="poll-percent" id="poll-percent-2">0%</div>
+                    </div>
+                    <div class="poll-bar-wrapper">
+                        <div class="poll-label">D</div>
+                        <div class="poll-bar-track">
+                            <div class="poll-bar-fill" id="poll-bar-3"></div>
+                        </div>
+                        <div class="poll-percent" id="poll-percent-3">0%</div>
+                    </div>
+                </div>
+                <div class="expert-opinion">
+                    <i class="fas fa-lightbulb text-gold"></i> <strong>Audience consensus:</strong> Option <span id="audience-consensus" class="text-gold">X</span> has the strongest lead.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PHONE A FRIEND -->
+    <div class="modal-overlay" id="modal-phone">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h2><i class="fas fa-phone-alt"></i> Phone A Friend</h2>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Step 1: Expert Selection -->
+                <div id="phone-expert-selection">
+                    <p class="modal-description">Select which expert friend you would like to call:</p>
+                    <div class="experts-list">
+                        <button class="expert-item-btn" data-expert="general">
+                            <div class="expert-avatar"><i class="fas fa-university"></i></div>
+                            <div class="expert-info">
+                                <strong>Prof. Shastri</strong>
+                                <span>History & General Knowledge Guru</span>
+                            </div>
+                        </button>
+                        <button class="expert-item-btn" data-expert="science">
+                            <div class="expert-avatar"><i class="fas fa-atom"></i></div>
+                            <div class="expert-info">
+                                <strong>Dr. Aditi Verma</strong>
+                                <span>ISRO Space Scientist & Tech Expert</span>
+                            </div>
+                        </button>
+                        <button class="expert-item-btn" data-expert="sports">
+                            <div class="expert-avatar"><i class="fas fa-medal"></i></div>
+                            <div class="expert-info">
+                                <strong>Coach Sandeep</strong>
+                                <span>Sports Commentator & Analyst</span>
+                            </div>
+                        </button>
+                        <button class="expert-item-btn" data-expert="entertainment">
+                            <div class="expert-avatar"><i class="fas fa-tv"></i></div>
+                            <div class="expert-info">
+                                <strong>Sneha Kapoor</strong>
+                                <span>Bollywood Critic & Cinephile</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Calling Animation -->
+                <div id="phone-calling" class="hidden text-center">
+                    <div class="phone-ring-animation">
+                        <i class="fas fa-phone-alt call-icon-pulse"></i>
+                    </div>
+                    <h3 id="calling-status">Calling Prof. Shastri...</h3>
+                    <p class="text-muted">Connecting call...</p>
+                </div>
+
+                <!-- Step 3: Friend Dialogue -->
+                <div id="phone-dialogue" class="hidden">
+                    <div class="phone-call-active">
+                        <div class="friend-active-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h4 id="active-friend-name">Prof. Shastri</h4>
+                        <span class="badge-active">On Call (30s limit)</span>
+                    </div>
+
+                    <div class="chat-container">
+                        <div class="chat-bubble received">
+                            <p id="friend-response-text">Thinking...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="questions.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
