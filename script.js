@@ -53,7 +53,8 @@ const audioAssets = {
     lock: new Audio("assets/Kbc Option Lock Tune.mp3"),
     tension: new Audio("assets/clock-sound.mp3"),
     questionAsk: new Audio("assets/Question.mp3"),
-    jackpotWin: new Audio("assets/Millionairekbc.mp3")
+    jackpotWin: new Audio("assets/Millionairekbc.mp3"),
+    jackpot7Crore: new Audio("assets/jackpot-win.mp3")
 };
 
 // Host commentary pool based on events
@@ -659,7 +660,7 @@ function endGame(isWin, reason, walkAwayAmount = null) {
         winningsEl.innerText = "₹7,00,00,000";
         detailEl.innerText = "You have answered all 16 questions correctly and won the ultimate prize!";
         msgEl.innerText = "Adbhut! An extraordinary display of knowledge!";
-        playSound("jackpotWin");
+        playSound("jackpot7Crore");
     } else {
         titleEl.innerText = "GAME OVER";
         titleEl.className = "game-title";
