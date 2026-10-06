@@ -49,7 +49,7 @@ const audioAssets = {
     intro: new Audio("assets/Intro.mp3"),
     amitabhIntro: new Audio("assets/AmitabhBachchanIntro.mp3"),
     correct: new Audio("assets/Kbc Correct Answer2.mp3"),
-    wrong: new Audio("assets/Kbc Galat Jawab.mp3"),
+    wrong: new Audio("assets/amitabh-galat-jawab.mp3"),
     lock: new Audio("assets/Kbc Option Lock Tune.mp3"),
     tension: new Audio("assets/clock-sound.mp3"),
     questionAsk: new Audio("assets/Question.mp3"),
@@ -585,10 +585,10 @@ function revealAnswer(selectedIdx) {
         playSound("wrong");
         speakHost("wrong");
 
-        // End Game after 4 seconds
+        // End Game after audio finishes (~6.5 seconds)
         setTimeout(() => {
             endGame(false, "incorrect");
-        }, 4000);
+        }, 6500);
     }
 }
 
@@ -618,7 +618,7 @@ function timeOutLose() {
     
     setTimeout(() => {
         endGame(false, "timeout");
-    }, 3500);
+    }, 6500);
 }
 
 // Quit voluntarily (Walk away)
