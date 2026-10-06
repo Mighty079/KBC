@@ -144,6 +144,10 @@ function initAudioVolume() {
             }
         };
     });
+    // Set wrong voice track to crisp, energetic 1.15x playback rate
+    if (audioAssets.wrong) {
+        audioAssets.wrong.playbackRate = 1.15;
+    }
 }
 
 function playSound(trackName, loop = false) {
@@ -161,12 +165,13 @@ function playSound(trackName, loop = false) {
     }
 }
 
-function stopAllSounds() {
-    Object.values(audioAssets).forEach(audio => {
+function stopAllSounds(keepWrong = false) {
+    Object.entries(audioAssets).forEach(([key, audio]) => {
+        if (keepWrong && key === "wrong") return;
         audio.pause();
         audio.currentTime = 0;
     });
-    gameState.activeAudios = [];
+    gameState.activeAudios = (keepWrong && audioAssets.wrong && !audioAssets.wrong.paused) ? [audioAssets.wrong] : [];
 }
 
 function updateVolume(val) {
@@ -451,13 +456,13 @@ function loadQuestion() {
         gameState.timerLeft = timeLimit;
         updateTimerCircle(timeLimit, timeLimit);
         
-        // Start tension music loop after question audio finishes
+        // Start tension music loop quickly after question loads (800ms)
         setTimeout(() => {
             if (!gameState.isLocked) {
                 playSound("tension", true);
                 startTimer();
             }
-        }, 1500);
+        }, 800);
     } else {
         // No timer for higher levels
         document.querySelector(".timer-area").style.display = "none";
@@ -554,10 +559,10 @@ function lockAnswer(selectedIdx) {
     speakHost("lock");
     playSound("lock");
 
-    // Tension build-up before showing results (4 seconds delay)
+    // Fast, responsive tension build-up before showing results (1.2 seconds)
     setTimeout(() => {
         revealAnswer(selectedIdx);
-    }, 4000);
+    }, 1200);
 }
 
 // Reveal correct/incorrect answer
@@ -574,10 +579,10 @@ function revealAnswer(selectedIdx) {
         playSound("correct");
         speakHost("correct");
 
-        // Advance level after 3.5 seconds
+        // Advance level quickly after celebration (1.6 seconds)
         setTimeout(() => {
             advanceLevel();
-        }, 3500);
+        }, 1600);
     } else {
         // WRONG ANSWER
         selectedBtn.classList.add("incorrect");
@@ -585,10 +590,10 @@ function revealAnswer(selectedIdx) {
         playSound("wrong");
         speakHost("wrong");
 
-        // End Game after audio finishes (~6.5 seconds)
+        // Fast transition to Game Over (2.5 seconds) while audio finishes playing in background
         setTimeout(() => {
             endGame(false, "incorrect");
-        }, 6500);
+        }, 2500);
     }
 }
 
@@ -606,7 +611,7 @@ function advanceLevel() {
 // Out of time lose trigger
 function timeOutLose() {
     gameState.isLocked = true;
-    stopAllSounds();
+    stopAllSounds(true);
     playSound("wrong");
     
     // Highlight correct option
@@ -618,7 +623,7 @@ function timeOutLose() {
     
     setTimeout(() => {
         endGame(false, "timeout");
-    }, 6500);
+    }, 2500);
 }
 
 // Quit voluntarily (Walk away)
@@ -636,7 +641,7 @@ function walkAway() {
 
 // Game Over Screen controller
 function endGame(isWin, reason, walkAwayAmount = null) {
-    stopAllSounds();
+    stopAllSounds(reason === "incorrect" || reason === "timeout");
     transitionToScreen("gameover-screen");
 
     const titleEl = document.getElementById("gameover-title");
